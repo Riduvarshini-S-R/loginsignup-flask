@@ -11,11 +11,11 @@
 <body>
     <section class="vh-100">
         <div class="container-fluid pt-5" style="background-image:url(../static/images/nutrition.jpg); background-size: cover; background-repeat: no-repeat;">
-            <div class="row">
+            <div class="row ">
                 <div class="col-12 col-md-6">
                 </div>
-                <div class="col-12 col-md-6 py-5" >
-                    <div class="pt-5 w-75" style="background: rgba(236, 236, 236, 0.71);
+                <div class="col-12 col-md-5 py-5" >
+                    <div class="w-100 pt-5 w-75" style="background: rgba(236, 236, 236, 0.71);
                     border-radius: 16px;
                     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
                     backdrop-filter: blur(15px);
@@ -24,17 +24,24 @@
                         <h2 class="text-center"><b>Nutrition Assistant Application</b></h2>
                         <div class="p-5">
                             <div class="text-center"><h3>Sign in</h3></div>
-                            <div class="form-outline mb-4">
-                                    <label class="py-3"><b>Email</b></label>
-                                    <input type="text" name="email" placeholder="Enter email" class="form-control" style="border-radius:40px;">
-                            </div>
-                            <div class="form-outline mb-4">
-                                <label class="py-3"><b>Password</b></label>
-                                <input type="text" name="password" placeholder="Enter password" class="form-control" style="border-radius:40px ;">
-                            </div>
-                            <div class="mb-4 align-content-center text-center">
-                                <a href="/home"><button class="btn btn-dark btn-lg btn-block" type="button">Login</button></a>
-                            </div>
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                <h6 class="text-dark text-center py-2">Error : {{ messages[0] }}</h6>
+                                {% endif %}
+                            {% endwith %}
+                            <form action="/" method="post">
+                                <div class="form-outline mb-4">
+                                        <label class="py-3"><b>Email</b></label>
+                                        <input type="email" name="email" placeholder="Enter email" class="form-control" style="border-radius:40px;">
+                                </div>
+                                <div class="form-outline mb-4">
+                                    <label class="py-3"><b>Password</b></label>
+                                    <input type="password" name="password" placeholder="Enter password" class="form-control" style="border-radius:40px ;">
+                                </div>
+                                <div class="mb-4 align-content-center text-center">
+                                    <button class="btn btn-dark btn-lg btn-block" type="submit">Login</button>
+                                </div>
+                            </form>
                         </div>
                         <div>
                             <p class="mb-5 pb-lg-2 text-center" style="color: #393f81;">Don't have an account? <a href="/signup"

@@ -12,9 +12,54 @@ app.secret_key = "789764532"
 conn=ibm_db.connect("DATABASE=bludb;HOSTNAME=19af6446-6171-4641-8aba-9dcff8e1b6ff.c1ogj3sd0tgtu0lqde00.databases.appdomain.cloud;PORT=30699;SECURITY=SSL;SSLServerCertificate=DigiCertGlobalRootCA.crt;UID=prr47494;PWD=ggtIQb5SN8tno7qc",'','')
 
 
-@app.route("/")
+def insertsql(tablename, fields, values):
+    query="Insert into "+tablename+"("
+
+    for i in fields:
+        query+=str(i)+","
+    query=query[:-1]+") Values ("
+    for i in range(len(fields)):
+        query+="?,"
+    query=query[:-1]+")"
+
+    print(query)
+
+    prep_stmt=ibm_db.prepare(conn,query)
+
+    for i in range(len(values)):
+        ibm_db.bind_param(prep_stmt,i+1,values[i])
+
+    ibm_db.execute(prep_stmt)
+
+
+
+@app.route("/",methods=('GET','POST'))
 def signin():
-    return render_template('signin.html')
+    if request.method=='POST':
+        email=request.form["email"]
+        password=request.form["password"]
+
+        query= ibm_db.exec_immediate(conn,"select * from userauth")
+
+        userdetails=ibm_db.fetch_assoc(query)
+
+        
+        flag=0
+        while userdetails!=False:
+            print(userdetails['EMAIL'],email,userdetails['PASSWORD']==password)
+            if userdetails['EMAIL']==email and userdetails["PASSWORD"]==password.strip():
+                flag=2;session["email"]=userdetails["EMAIL"];break
+            elif userdetails["EMAIL"]==email and userdetails["PASSWORD"]!=password.strip():
+                flag=1;break
+            userdetails=ibm_db.fetch_assoc(query)
+        if flag==0:
+            flash("User doesn't exist")
+        elif flag==1:
+            flash("Password is incorrect")
+        else:
+            return redirect(url_for("home")) 
+
+    return render_template("signin.html")
 
 @app.route("/signup")
 def signup():
@@ -41,21 +86,48 @@ def create():
 
         else:
             session['email']=email
-            session['password']=password
-            print(session['email'],session['password'])
+            fields=["email","password"]
+            values=[email,password]
+            insertsql("userauth",fields,values)
             return redirect(url_for("profile"))
             
     return  redirect(url_for("signup"))
 
-@app.route("/profile")
+@app.route("/profile",methods=('POST','GET'))
 def profile():
     print(session['email'],session['password'])
+    email=session['email']
+    if request.method=="POST":
+        name=request.form['name']
+        age=request.form['age']
+        gender=request.form['gender']
+        weight=request.form['weight']
+        height=request.form['height']
+        allergies=request.form['allergies']
+        healthissues=request.form['healthissues']
+
+        fields=["email","name","age","gender","weight","height","allergies","healthissues"]
+        values=[email,name,age,gender,weight,height,allergies,healthissues]
+        insertsql("userdetails",fields,values)
+
+        
+        return redirect(url_for('home'))
+
     return render_template('profile.html')
 
 @app.route("/home")
 def home():
-    return render_template("home.html")
+    try:
+        if session["email"]:
+            return render_template("home.html",email=session["email"])
+    except:
+        return redirect(url_for("login"))
+    return redirect(url_for("login"))
 
+@app.route("/logout",methods=('POST','GET'))
+def logout():
+    session['userid']=None 
+    return redirect(url_for("signin"))
 
 
 

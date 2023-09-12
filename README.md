@@ -1,1 +1,1 @@
-# nutritionassistant
+# Nutrition Assistant Application

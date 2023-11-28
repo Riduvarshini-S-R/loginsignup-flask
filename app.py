@@ -56,29 +56,3 @@ def profile():
 def home():
     return render_template("home.html")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# try:
-#                 query="Insert into clients (mailid,password) values (?,?)"
-#                 stmt=ibm_db.prepare(conn,query)
-#                 ibm_db.bind_param(stmt,1,email)
-#                 ibm_db.bind_param(stmt,2,password)
-#                 ibm_db.execute(stmt)
-#             except:
-#                 flash("connection error")
-#                 print("connection error!!")
-#             finally:
-#                 return render_template("profile.html")
